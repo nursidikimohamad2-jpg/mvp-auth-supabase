@@ -3,14 +3,12 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Login | MVP Auth</title>
+  <title>MVP Auth Supabase</title>
   <link rel="stylesheet" href="./styles.css" />
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="./js/supabaseClient.js"></script>
-  <script src="./js/auth.js"></script>
 </head>
 <body>
   <header><h1>MVP Auth Supabase</h1></header>
+
   <main class="wrap">
     <section class="card">
       <h2>Login</h2>
@@ -19,6 +17,7 @@
       <button id="loginBtn">Masuk</button>
       <p id="loginMsg" class="msg"></p>
     </section>
+
     <section class="card">
       <h2>Register</h2>
       <input id="regEmail" type="email" placeholder="Email" />
@@ -27,26 +26,31 @@
       <p id="regMsg" class="msg"></p>
     </section>
   </main>
-  <footer><small>© 2025 MVP Auth Supabase</small></footer>
-  <script>
-    document.getElementById('loginBtn').addEventListener('click', async () => {
-      const email = document.getElementById('loginEmail').value.trim();
-      const password = document.getElementById('loginPassword').value.trim();
-      const { error } = await signIn(email, password);
-      if (error) document.getElementById('loginMsg').textContent = error.message;
-      else window.location.href = "dashboard.html";
-    });
-    document.getElementById('regBtn').addEventListener('click', async () => {
-      const email = document.getElementById('regEmail').value.trim();
-      const password = document.getElementById('regPassword').value.trim();
-      const { error } = await signUpAndBootstrapProfile(email, password);
-      if (error) document.getElementById('regMsg').textContent = error.message;
-      else window.location.href = "dashboard.html";
-    });
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="./supabaseClient.js"></script>
-<script src="./auth.js"></script>
 
+  <footer><small>© 2025 MVP Auth Supabase</small></footer>
+
+  <!-- LIB & SCRIPT: JANGAN taruh di dalam <script> lain -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./supabaseClient.js"></script>
+  <script src="./auth.js"></script>
+
+  <script>
+    // Hook tombol
+    document.getElementById('loginBtn').addEventListener('click', async () => {
+      const email = loginEmail.value.trim();
+      const password = loginPassword.value.trim();
+      const { error } = await signIn(email, password);
+      if (error) loginMsg.textContent = error.message;
+      else window.location.href = "dashboard.html";
+    });
+
+    document.getElementById('regBtn').addEventListener('click', async () => {
+      const email = regEmail.value.trim();
+      const password = regPassword.value.trim();
+      const { error } = await signUpAndBootstrapProfile(email, password);
+      if (error) regMsg.textContent = error.message;
+      else window.location.href = "dashboard.html";
+    });
   </script>
 </body>
 </html>
