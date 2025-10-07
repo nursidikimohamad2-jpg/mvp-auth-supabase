@@ -1,59 +1,56 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>MVP Auth Supabase</title>
-  <link rel="stylesheet" href="./styles.css" />
+  <style>
+    body{background:#0b1220;color:#e5e7eb;font-family:system-ui,Arial,sans-serif;margin:0}
+    header{padding:24px 16px;text-align:center;font-size:28px}
+    .card{max-width:520px;margin:18px auto;background:#0f172a;border-radius:12px;padding:22px}
+    input,button{width:100%;padding:12px;border-radius:8px;border:0}
+    input{background:#1e293b;color:#fff;margin:6px 0}
+    button{background:#6366f1;color:#fff;margin-top:8px;cursor:pointer}
+  </style>
 </head>
 <body>
-  <header><h1>MVP Auth Supabase</h1></header>
+  <header>MVP Auth Supabase</header>
 
-  <main class="wrap">
-    <section class="card">
-      <h2>Login</h2>
-      <input id="loginEmail" type="email" placeholder="Email" />
-      <input id="loginPassword" type="password" placeholder="Password" />
-      <button id="loginBtn">Masuk</button>
-      <p id="loginMsg" class="msg"></p>
-    </section>
+  <section class="card">
+    <h2>Login</h2>
+    <input id="login-email" type="email" placeholder="Email" />
+    <input id="login-password" type="password" placeholder="Password" />
+    <button id="login-btn">Masuk</button>
+  </section>
 
-    <section class="card">
-      <h2>Register</h2>
-      <input id="regEmail" type="email" placeholder="Email" />
-      <input id="regPassword" type="password" placeholder="Password" />
-      <button id="regBtn">Daftar</button>
-      <p id="regMsg" class="msg"></p>
-    </section>
-  </main>
+  <section class="card">
+    <h2>Register</h2>
+    <input id="reg-email" type="email" placeholder="Email" />
+    <input id="reg-password" type="password" placeholder="Password" />
+    <button id="register-btn">Daftar</button>
+  </section>
 
-  <footer><small>© 2025 MVP Auth Supabase</small></footer>
-
-  <!-- LIB & SCRIPT: JANGAN taruh di dalam <script> lain -->
+  <!-- urutan script WAJIB seperti ini dan hanya sekali -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="./supabaseClient.js"></script>
   <script src="./auth.js"></script>
-
   <script>
-    // Hook tombol
-    document.getElementById('loginBtn').addEventListener('click', async () => {
-      const email = loginEmail.value.trim();
-      const password = loginPassword.value.trim();
+    document.getElementById('login-btn').onclick = async () => {
+      const email = login-email.value || document.getElementById('login-email').value;
+      const password = login-password.value || document.getElementById('login-password').value;
       const { error } = await signIn(email, password);
-      if (error) loginMsg.textContent = error.message;
-      else window.location.href = "dashboard.html";
-    });
+      if (error) return alert(error.message);
+      const admin = await isAdmin();
+      window.location.href = admin ? 'admin.html' : 'dashboard.html';
+    };
 
-    document.getElementById('regBtn').addEventListener('click', async () => {
-      const email = regEmail.value.trim();
-      const password = regPassword.value.trim();
+    document.getElementById('register-btn').onclick = async () => {
+      const email = document.getElementById('reg-email').value;
+      const password = document.getElementById('reg-password').value;
       const { error } = await signUpAndBootstrapProfile(email, password);
-      if (error) regMsg.textContent = error.message;
-      else window.location.href = "dashboard.html";
-    });
+      if (error) return alert(error.message);
+      alert('Registrasi berhasil! Silakan login.');
+    };
   </script>
 </body>
 </html>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="./supabaseClient.js?v=1"></script>
-<script src="./auth.js?v=1"></script>
