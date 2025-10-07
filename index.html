@@ -1,78 +1,62 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>MVP Auth Supabase (1 File)</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MVP Auth Supabase (Tanpa Verifikasi Email)</title>
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <style>
-    :root { --brand:#4f46e5; --bg:#0b1220; --card:#0f172a; --border:#1f2a44; --muted:#94a3b8; }
-    body { margin:0; background:var(--bg); color:#e5e7eb; font-family:system-ui, sans-serif; }
-    h1 { text-align:center; padding:1rem; font-size:1.5rem; }
-    .wrap { max-width:400px; margin:2rem auto; background:var(--card); border:1px solid var(--border);
-      border-radius:12px; padding:1.5rem; }
-    h2 { margin-top:0; }
-    input { width:100%; padding:.6rem; margin:.4rem 0; border-radius:6px; border:1px solid var(--border);
-      background:#111a2d; color:#fff; }
-    button { width:100%; padding:.7rem; background:var(--brand); border:none; border-radius:8px;
-      color:white; font-weight:600; cursor:pointer; margin-top:.5rem; }
-    button:hover { opacity:.9; }
-    .msg { text-align:center; padding-top:1rem; color:#a3e635; }
+    body { background:#0b1220; color:white; font-family:sans-serif; display:flex; flex-direction:column; align-items:center; }
+    h1 { margin-top:40px; }
+    .card { background:#111a2f; padding:30px; border-radius:10px; margin:20px; width:300px; }
+    input { width:100%; padding:10px; margin:6px 0; border:none; border-radius:6px; }
+    button { width:100%; padding:10px; background:#5a5cff; color:white; border:none; border-radius:6px; cursor:pointer; margin-top:10px; }
+    button:hover { background:#7677ff; }
+    .error { color:#ff5b5b; margin-top:8px; text-align:center; font-size:14px; }
   </style>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
   <h1>MVP Auth Supabase</h1>
 
-  <div class="wrap">
+  <div class="card">
     <h2>Login</h2>
-    <input id="login-email" type="email" placeholder="Email" />
-    <input id="login-pass" type="password" placeholder="Password" />
+    <input id="loginEmail" type="email" placeholder="Email" />
+    <input id="loginPassword" type="password" placeholder="Password" />
     <button onclick="login()">Masuk</button>
+    <p id="loginError" class="error"></p>
   </div>
 
-  <div class="wrap">
+  <div class="card">
     <h2>Register</h2>
-    <input id="reg-email" type="email" placeholder="Email" />
-    <input id="reg-pass" type="password" placeholder="Password" />
+    <input id="regEmail" type="email" placeholder="Email" />
+    <input id="regPassword" type="password" placeholder="Password" />
     <button onclick="register()">Daftar</button>
+    <p id="regError" class="error"></p>
   </div>
-
-  <div id="msg" class="msg"></div>
 
   <script>
-    // === KONFIGURASI SUPABASE ===
+    // Ganti sesuai project kamu
     const SUPABASE_URL = "https://vkhfrkbonzzydwcmrcka.supabase.co";
-    const SUPABASE_ANON_KEY = 
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZraGZya2Jvbnp6eWR3Y21yY2thIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk4Mjg4MjksImV4cCI6MjA3NTQwNDgyOX0.NHV21GAv9cNBgxMAiZ8gs21v7hLLhLTCL3tTBWqbrXE";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZraGZya2Jvbnp6eWR3Y21yY2thIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk4Mjg4MjksImV4cCI6MjA3NTQwNDgyOX0.NHV21GAv9cNBgxMAiZ8gs21v7hLLhLTCL3tTBWqbrXE";
 
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    const msg = (t, c="#a3e635") => {
-      const el = document.getElementById("msg");
-      el.textContent = t;
-      el.style.color = c;
-    };
-
-    // === REGISTER ===
     async function register() {
-      const email = document.getElementById("reg-email").value.trim();
-      const password = document.getElementById("reg-pass").value.trim();
-      if (!email || !password) return msg("Isi email & password!", "orange");
-      msg("Memproses registrasi...");
-      const { data, error } = await supabase.auth.signUp({ email, password });
-      if (error) return msg("Gagal daftar: " + error.message, "red");
-      msg("Berhasil daftar! Periksa email untuk verifikasi.");
+      const email = document.getElementById("regEmail").value;
+      const password = document.getElementById("regPassword").value;
+      const { data, error } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: null }});
+      const msg = document.getElementById("regError");
+      if (error) msg.textContent = "Gagal daftar: " + error.message;
+      else msg.textContent = "Berhasil daftar! Sekarang login.";
     }
 
-    // === LOGIN ===
     async function login() {
-      const email = document.getElementById("login-email").value.trim();
-      const password = document.getElementById("login-pass").value.trim();
-      if (!email || !password) return msg("Isi email & password!", "orange");
-      msg("Memproses login...");
+      const email = document.getElementById("loginEmail").value;
+      const password = document.getElementById("loginPassword").value;
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) return msg("Gagal login: " + error.message, "red");
-      msg("Login berhasil! Selamat datang, " + email);
+      const msg = document.getElementById("loginError");
+      if (error) msg.textContent = "Gagal login: " + error.message;
+      else msg.textContent = "Login berhasil ✅";
     }
   </script>
 </body>
