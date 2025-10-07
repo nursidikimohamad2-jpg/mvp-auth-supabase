@@ -12,3 +12,6 @@ async function renderUsers() {
   });
   container.innerHTML = ''; container.appendChild(list);
 }
+<script src="/mvp-auth-supabase/supabaseClient.js?v=2"></script>
+<script src="/mvp-auth-supabase/auth.js?v=2"></script>
+<script src="/mvp-auth-supabase/admin.js?v=2"></script> <!-- khusus admin.html -->
