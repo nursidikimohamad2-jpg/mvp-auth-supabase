@@ -3,16 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MVP Auth Supabase (Tanpa Verifikasi Email)</title>
+  <title>MVP Auth Supabase (Tanpa Verifikasi)</title>
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <style>
-    body { background:#0b1220; color:white; font-family:sans-serif; display:flex; flex-direction:column; align-items:center; }
-    h1 { margin-top:40px; }
-    .card { background:#111a2f; padding:30px; border-radius:10px; margin:20px; width:300px; }
-    input { width:100%; padding:10px; margin:6px 0; border:none; border-radius:6px; }
-    button { width:100%; padding:10px; background:#5a5cff; color:white; border:none; border-radius:6px; cursor:pointer; margin-top:10px; }
-    button:hover { background:#7677ff; }
-    .error { color:#ff5b5b; margin-top:8px; text-align:center; font-size:14px; }
+    :root { --bg:#0b1220; --card:#111a2f; --btn:#5a5cff; --btnh:#7677ff; --err:#ff6363; --ok:#7CFC9A; }
+    body{background:var(--bg);color:#fff;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,sans-serif;display:flex;flex-direction:column;align-items:center}
+    h1{margin:36px 0 8px}
+    .card{background:var(--card);padding:28px;border-radius:12px;margin:18px;width:320px}
+    .card h2{margin:0 0 12px}
+    input{width:100%;padding:12px 10px;margin:6px 0;border:none;border-radius:8px;background:#0e1626;color:#fff}
+    button{width:100%;padding:12px;background:var(--btn);color:#fff;border:none;border-radius:8px;cursor:pointer;margin-top:10px;font-weight:600}
+    button:hover{background:var(--btnh)}
+    .msg{margin-top:10px;font-size:14px;text-align:center}
+    .err{color:var(--err)} .ok{color:var(--ok)}
   </style>
 </head>
 <body>
@@ -20,44 +23,74 @@
 
   <div class="card">
     <h2>Login</h2>
-    <input id="loginEmail" type="email" placeholder="Email" />
-    <input id="loginPassword" type="password" placeholder="Password" />
-    <button onclick="login()">Masuk</button>
-    <p id="loginError" class="error"></p>
+    <input id="loginEmail" type="email" placeholder="Email">
+    <input id="loginPassword" type="password" placeholder="Password">
+    <button id="btnLogin">Masuk</button>
+    <p id="loginMsg" class="msg"></p>
   </div>
 
   <div class="card">
     <h2>Register</h2>
-    <input id="regEmail" type="email" placeholder="Email" />
-    <input id="regPassword" type="password" placeholder="Password" />
-    <button onclick="register()">Daftar</button>
-    <p id="regError" class="error"></p>
+    <input id="regEmail" type="email" placeholder="Email">
+    <input id="regPassword" type="password" placeholder="Password">
+    <button id="btnReg">Daftar</button>
+    <p id="regMsg" class="msg"></p>
   </div>
 
   <script>
-    // Ganti sesuai project kamu
+    // === GANTI DENGAN MILIKMU ===
     const SUPABASE_URL = "https://vkhfrkbonzzydwcmrcka.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZraGZya2Jvbnp6eWR3Y21yY2thIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk4Mjg4MjksImV4cCI6MjA3NTQwNDgyOX0.NHV21GAv9cNBgxMAiZ8gs21v7hLLhLTCL3tTBWqbrXE";
+    // ============================
 
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    async function register() {
-      const email = document.getElementById("regEmail").value;
-      const password = document.getElementById("regPassword").value;
-      const { data, error } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: null }});
-      const msg = document.getElementById("regError");
-      if (error) msg.textContent = "Gagal daftar: " + error.message;
-      else msg.textContent = "Berhasil daftar! Sekarang login.";
-    }
+    const $ = (id) => document.getElementById(id);
+    const show = (el, text, ok=false) => { el.textContent = text; el.className = "msg " + (ok ? "ok":"err"); };
 
-    async function login() {
-      const email = document.getElementById("loginEmail").value;
-      const password = document.getElementById("loginPassword").value;
+    // 1) REGISTER: tidak menampilkan pesan verifikasi + auto-login
+    $("btnReg").onclick = async () => {
+      const email = $("regEmail").value.trim();
+      const password = $("regPassword").value;
+      const regMsg = $("regMsg"), loginMsg = $("loginMsg");
+      regMsg.textContent = ""; loginMsg.textContent = "";
+
+      const { data, error } = await supabase.auth.signUp({
+        email, password,
+        options: { emailRedirectTo: null } // hilangkan redirect verif
+      });
+
+      if (error) return show(regMsg, "Gagal daftar: " + error.message);
+
+      // Coba auto-login langsung
+      const { data: sdata, error: lerr } = await supabase.auth.signInWithPassword({ email, password });
+      if (lerr) {
+        // Jika project masih mewajibkan verifikasi, keluarkan pesan spesifik
+        if (/confirm|not confirmed/i.test(lerr.message)) {
+          return show(regMsg, "Project masih mewajibkan verifikasi email. Matikan 'Confirm email' di Supabase → Auth → Providers → Email.");
+        }
+        return show(regMsg, "Gagal auto-login: " + lerr.message);
+      }
+      show(regMsg, "Akun dibuat & login berhasil ✅", true);
+    };
+
+    // 2) LOGIN
+    $("btnLogin").onclick = async () => {
+      const email = $("loginEmail").value.trim();
+      const password = $("loginPassword").value;
+      const msg = $("loginMsg");
+      msg.textContent = "";
+
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-      const msg = document.getElementById("loginError");
-      if (error) msg.textContent = "Gagal login: " + error.message;
-      else msg.textContent = "Login berhasil ✅";
-    }
+      if (error) {
+        if (/confirm|not confirmed/i.test(error.message)) {
+          return show(msg, "Email belum terkonfirmasi. Jika ingin tanpa verifikasi, matikan toggle 'Confirm email' di Supabase.", false);
+        }
+        return show(msg, "Gagal login: " + error.message);
+      }
+      show(msg, "Login berhasil ✅", true);
+      // window.location.href = "dashboard.html"; // kalau mau redirect
+    };
   </script>
 </body>
 </html>
