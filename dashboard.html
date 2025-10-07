@@ -1,46 +1,25 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Dashboard</title>
-  <link rel="stylesheet" href="./styles.css" />
+  <style>
+    body{background:#0b1220;color:#fff;font-family:sans-serif;text-align:center;padding:40px}
+    button{background:#6366f1;color:#fff;border:0;border-radius:8px;padding:10px 16px;cursor:pointer}
+  </style>
 </head>
 <body>
-  <header>
-    <h1>Dashboard User</h1>
-    <button id="logoutBtn">Logout</button>
-  </header>
-
-  <main class="wrap">
-    <section class="card">
-      <h2>Profil</h2>
-      <p><strong>Email:</strong> <span id="email">Memuat...</span></p>
-      <p><strong>Status:</strong> <span id="isAdmin">Memuat...</span></p>
-      <a href="admin.html" id="adminLink" style="display:none;">Ke Panel Admin</a>
-    </section>
-  </main>
+  <h1>Dashboard</h1>
+  <p>Selamat datang.</p>
+  <button id="logoutBtn">Logout</button>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="./supabaseClient.js"></script>
   <script src="./auth.js"></script>
   <script>
     guardPage();
-
-    (async () => {
-      const user = await getUser();
-      if (user) {
-        email.textContent = user.email;
-        const admin = await isAdmin();
-        isAdmin.textContent = admin ? "Admin" : "User";
-        if (admin) adminLink.style.display = "block";
-      }
-    })();
-
-    logoutBtn.addEventListener('click', async () => {
-      await signOut();
-      window.location.href = "index.html";
-    });
+    document.getElementById('logoutBtn').onclick = signOut;
   </script>
 </body>
 </html>
