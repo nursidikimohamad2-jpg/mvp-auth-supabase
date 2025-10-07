@@ -1,56 +1,79 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>MVP Auth Supabase</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MVP Auth Supabase (1 File)</title>
   <style>
-    body{background:#0b1220;color:#e5e7eb;font-family:system-ui,Arial,sans-serif;margin:0}
-    header{padding:24px 16px;text-align:center;font-size:28px}
-    .card{max-width:520px;margin:18px auto;background:#0f172a;border-radius:12px;padding:22px}
-    input,button{width:100%;padding:12px;border-radius:8px;border:0}
-    input{background:#1e293b;color:#fff;margin:6px 0}
-    button{background:#6366f1;color:#fff;margin-top:8px;cursor:pointer}
+    :root { --brand:#4f46e5; --bg:#0b1220; --card:#0f172a; --border:#1f2a44; --muted:#94a3b8; }
+    body { margin:0; background:var(--bg); color:#e5e7eb; font-family:system-ui, sans-serif; }
+    h1 { text-align:center; padding:1rem; font-size:1.5rem; }
+    .wrap { max-width:400px; margin:2rem auto; background:var(--card); border:1px solid var(--border);
+      border-radius:12px; padding:1.5rem; }
+    h2 { margin-top:0; }
+    input { width:100%; padding:.6rem; margin:.4rem 0; border-radius:6px; border:1px solid var(--border);
+      background:#111a2d; color:#fff; }
+    button { width:100%; padding:.7rem; background:var(--brand); border:none; border-radius:8px;
+      color:white; font-weight:600; cursor:pointer; margin-top:.5rem; }
+    button:hover { opacity:.9; }
+    .msg { text-align:center; padding-top:1rem; color:#a3e635; }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-  <header>MVP Auth Supabase</header>
+  <h1>MVP Auth Supabase</h1>
 
-  <section class="card">
+  <div class="wrap">
     <h2>Login</h2>
     <input id="login-email" type="email" placeholder="Email" />
-    <input id="login-password" type="password" placeholder="Password" />
-    <button id="login-btn">Masuk</button>
-  </section>
+    <input id="login-pass" type="password" placeholder="Password" />
+    <button onclick="login()">Masuk</button>
+  </div>
 
-  <section class="card">
+  <div class="wrap">
     <h2>Register</h2>
     <input id="reg-email" type="email" placeholder="Email" />
-    <input id="reg-password" type="password" placeholder="Password" />
-    <button id="register-btn">Daftar</button>
-  </section>
+    <input id="reg-pass" type="password" placeholder="Password" />
+    <button onclick="register()">Daftar</button>
+  </div>
 
-  <!-- urutan script WAJIB seperti ini dan hanya sekali -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="./supabaseClient.js"></script>
-  <script src="./auth.js"></script>
+  <div id="msg" class="msg"></div>
+
   <script>
-    document.getElementById('login-btn').onclick = async () => {
-      const email = login-email.value || document.getElementById('login-email').value;
-      const password = login-password.value || document.getElementById('login-password').value;
-      const { error } = await signIn(email, password);
-      if (error) return alert(error.message);
-      const admin = await isAdmin();
-      window.location.href = admin ? 'admin.html' : 'dashboard.html';
+    // === KONFIGURASI SUPABASE ===
+    const SUPABASE_URL = "https://vkhfrkbonzzydwcmrcka.supabase.co";
+    const SUPABASE_ANON_KEY = 
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZraGZya2Jvbnp6eWR3Y21yY2thIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk4Mjg4MjksImV4cCI6MjA3NTQwNDgyOX0.NHV21GAv9cNBgxMAiZ8gs21v7hLLhLTCL3tTBWqbrXE";
+
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const msg = (t, c="#a3e635") => {
+      const el = document.getElementById("msg");
+      el.textContent = t;
+      el.style.color = c;
     };
 
-    document.getElementById('register-btn').onclick = async () => {
-      const email = document.getElementById('reg-email').value;
-      const password = document.getElementById('reg-password').value;
-      const { error } = await signUpAndBootstrapProfile(email, password);
-      if (error) return alert(error.message);
-      alert('Registrasi berhasil! Silakan login.');
-    };
+    // === REGISTER ===
+    async function register() {
+      const email = document.getElementById("reg-email").value.trim();
+      const password = document.getElementById("reg-pass").value.trim();
+      if (!email || !password) return msg("Isi email & password!", "orange");
+      msg("Memproses registrasi...");
+      const { data, error } = await supabase.auth.signUp({ email, password });
+      if (error) return msg("Gagal daftar: " + error.message, "red");
+      msg("Berhasil daftar! Periksa email untuk verifikasi.");
+    }
+
+    // === LOGIN ===
+    async function login() {
+      const email = document.getElementById("login-email").value.trim();
+      const password = document.getElementById("login-pass").value.trim();
+      if (!email || !password) return msg("Isi email & password!", "orange");
+      msg("Memproses login...");
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) return msg("Gagal login: " + error.message, "red");
+      msg("Login berhasil! Selamat datang, " + email);
+    }
   </script>
 </body>
 </html>
