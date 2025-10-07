@@ -1,23 +1,20 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Admin Panel</title>
-  <link rel="stylesheet" href="./styles.css" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin Dashboard</title>
+  <style>
+    body{background:#0b1220;color:#fff;font-family:sans-serif;padding:30px}
+    h1{text-align:center}
+    #users{background:#0f172a;padding:16px;border-radius:12px;margin-top:20px}
+    button{background:#6366f1;color:#fff;border:0;border-radius:8px;padding:8px 14px;cursor:pointer}
+  </style>
 </head>
 <body>
-  <header>
-    <h1>Panel Admin</h1>
-    <button id="logoutBtn">Logout</button>
-  </header>
-
-  <main class="wrap">
-    <section class="card">
-      <h2>Daftar User</h2>
-      <div id="users"></div>
-    </section>
-  </main>
+  <h1>Admin Dashboard</h1>
+  <button id="logoutBtn">Logout</button>
+  <div id="users">Memuat daftar pengguna...</div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="./supabaseClient.js"></script>
@@ -25,14 +22,10 @@
   <script src="./admin.js"></script>
   <script>
     (async () => {
-      await guardAdminPage();
+      await guardAdminPage();  // redirect ke dashboard kalau bukan admin
       await renderUsers();
     })();
-
-    logoutBtn.addEventListener('click', async () => {
-      await signOut();
-      window.location.href = "index.html";
-    });
+    document.getElementById('logoutBtn').onclick = signOut;
   </script>
 </body>
 </html>
