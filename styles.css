@@ -1,0 +1,9 @@
+:root { --bg:#0b1220; --card:#0f172a; --border:#1f2a44; --txt:#e5e7eb; --brand:#4f46e5; }
+body { margin:0; font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif; background:var(--bg); color:var(--txt); }
+header, footer { background:var(--card); padding:10px 16px; border-bottom:1px solid var(--border); }
+main.wrap { max-width:600px; margin:30px auto; padding:0 12px; }
+.card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:16px; margin-bottom:20px; }
+input { width:100%; padding:10px; margin-top:8px; border-radius:8px; border:1px solid var(--border); background:#0b1020; color:var(--txt); }
+button { background:var(--brand); color:white; border:none; border-radius:8px; padding:10px 14px; margin-top:10px; cursor:pointer; }
+.msg { color:#fbbf24; font-size:14px; margin-top:6px; }
+a { color:#38bdf8; text-decoration:none; }

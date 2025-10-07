@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./js/supabaseClient.js"></script>
+  <script src="./js/auth.js"></script>
+</head>
+<body>
+  <header>
+    <h1>Dashboard User</h1>
+    <button id="logoutBtn">Logout</button>
+  </header>
+  <main class="wrap">
+    <section class="card">
+      <h2>Profil</h2>
+      <p><strong>Email:</strong> <span id="email">Memuat...</span></p>
+      <p><strong>Status:</strong> <span id="isAdmin">Memuat...</span></p>
+      <a href="admin.html" id="adminLink" style="display:none;">Ke Panel Admin</a>
+    </section>
+  </main>
+  <script>
+    guardPage();
+    (async () => {
+      const user = await getUser();
+      if (user) {
+        document.getElementById('email').textContent = user.email;
+        const admin = await isAdmin();
+        document.getElementById('isAdmin').textContent = admin ? "Admin" : "User";
+        if (admin) document.getElementById('adminLink').style.display = "block";
+      }
+    })();
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+      await signOut();
+      window.location.href = "index.html";
+    });
+  </script>
+</body>
+</html>
